@@ -407,7 +407,7 @@ const PageProfile: React.FC = () => {
         <Paper elevation={2} sx={{ borderRadius: 3, p: 2.5, mb: 2, bgcolor: 'background.paper' }}>
           <Stack direction="row" alignItems="center" gap={1} mb={2}>
             <PaletteIcon sx={{ color: 'primary.main' }} />
-            <Typography sx={{ fontWeight: 700, fontSize: 16, color: 'text.primary' }}>Apariencia</Typography>
+            <Typography sx={{ fontWeight: 700, fontSize: 16, color: 'text.primary' }}>Appearance</Typography>
           </Stack>
           <Stack direction="row" alignItems="center" justifyContent="space-between">
             <Stack direction="row" alignItems="center" gap={1.5}>
@@ -417,9 +417,9 @@ const PageProfile: React.FC = () => {
                 <LightModeIcon sx={{ color: 'warning.main', fontSize: 22 }} />
               )}
               <Box>
-                <Typography sx={{ fontWeight: 600, fontSize: 14, color: 'text.primary' }}>Modo oscuro</Typography>
+                <Typography sx={{ fontWeight: 600, fontSize: 14, color: 'text.primary' }}>Dark mode</Typography>
                 <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>
-                  {isDark ? 'Activado' : 'Desactivado'}
+                  {isDark ? 'Enabled' : 'Disabled'}
                 </Typography>
               </Box>
             </Stack>

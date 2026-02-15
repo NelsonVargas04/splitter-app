@@ -1,6 +1,6 @@
-Servidor Express minimal para `app-dividir-gastos`.
+Minimal Express server for SplitApp.
 
-Instalación y ejecución:
+Installation and execution:
 
 ```powershell
 cd server
@@ -8,4 +8,4 @@ npm install
 npm start
 ```
 
-La API escucha en `http://localhost:3000`.
+The API listens on `http://localhost:3000`.

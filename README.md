@@ -1,15 +1,15 @@
-# app-dividir-gastos
+# SplitApp
 
-Proyecto "app-dividir-gastos" — una app sencilla para registrar personas y gastos, y calcular cómo dividirlos.
+SplitApp — a simple app to register people and expenses, and calculate how to split them.
 
-Estructura:
+Structure:
 - server/: API Node + Express
-- client/: Cliente React + Vite
+- client/: Client React + Vite
 
-Requisitos:
-- Node.js 16+ y npm
+Requirements:
+- Node.js 16+ and npm
 
-Cómo ejecutar (en PowerShell):
+How to run (in PowerShell):
 
 1) Backend
 ```powershell
@@ -25,8 +25,8 @@ npm install
 npm run dev
 ```
 
-Abrir el navegador en `http://localhost:5173` (frontend) y la API en `http://localhost:3000`.
+Open the browser at `http://localhost:5173` (frontend) and the API at `http://localhost:3000`.
 
-Notas:
-- Ejecuta backend y frontend en terminales separadas.
-- Si quieres que arranquen con un comando simultáneo, puedo añadir un script raíz con `concurrently`.
+Notes:
+- Run backend and frontend in separate terminals.
+- If you want them to start with a single simultaneous command, a root script with `concurrently` can be added.

@@ -46,13 +46,13 @@ export default function App() {
 
   return (
     <div className="container">
-      <h1>app-dividir-gastos</h1>
+      <h1>SplitApp</h1>
 
       <section>
-        <h2>Personas</h2>
+        <h2>People</h2>
         <form onSubmit={addPerson}>
-          <input value={name} onChange={e=>setName(e.target.value)} placeholder="Nombre" />
-          <button>Agregar</button>
+          <input value={name} onChange={e=>setName(e.target.value)} placeholder="Name" />
+          <button>Add</button>
         </form>
         <ul>
           {people.map((p:any)=> <li key={p.id}>{p.name} (id: {p.id})</li>)}
@@ -60,31 +60,31 @@ export default function App() {
       </section>
 
       <section>
-        <h2>Gastos</h2>
+        <h2>Expenses</h2>
         <form onSubmit={addExpense}>
-          <input value={desc} onChange={e=>setDesc(e.target.value)} placeholder="Descripción" />
-          <input value={amount} onChange={e=>setAmount(e.target.value)} placeholder="Monto" type="number" step="0.01" />
+          <input value={desc} onChange={e=>setDesc(e.target.value)} placeholder="Description" />
+          <input value={amount} onChange={e=>setAmount(e.target.value)} placeholder="Amount" type="number" step="0.01" />
           <select value={payerId} onChange={e=>setPayerId(e.target.value)}>
-            <option value="">Pagador</option>
+            <option value="">Payer</option>
             {people.map((p:any)=> <option key={p.id} value={p.id}>{p.name}</option>)}
           </select>
           <div>
-            <small>Participantes:</small>
+            <small>Participants:</small>
             {people.map((p:any)=> (
               <label key={p.id}><input type="checkbox" checked={participants.includes(p.id)} onChange={()=>toggleParticipant(p.id)} /> {p.name}</label>
             ))}
           </div>
-          <button>Agregar gasto</button>
+          <button>Add expense</button>
         </form>
 
         <ul>
-          {expenses.map((ex:any)=> <li key={ex.id}>{ex.description} — {ex.amount} — pagó: {ex.payerId}</li>)}
+          {expenses.map((ex:any)=> <li key={ex.id}>{ex.description} — {ex.amount} — paid by: {ex.payerId}</li>)}
         </ul>
       </section>
 
       <section>
-        <h2>Resumen (balance)</h2>
-        <button onClick={fetchSplit}>Actualizar</button>
+        <h2>Summary (balance)</h2>
+        <button onClick={fetchSplit}>Refresh</button>
         <ul>
           {split.map((s:any)=> <li key={s.id}>{s.name}: {s.balance}</li>)}
         </ul>

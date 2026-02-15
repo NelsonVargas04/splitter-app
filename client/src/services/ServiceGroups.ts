@@ -88,9 +88,9 @@ const ServiceGroups = {
     });
     if (!response.ok) {
       const error = await response.json();
-      return { success: false, message: error.message || 'Error al enviar solicitud' };
+      return { success: false, message: error.message || 'Failed to send request' };
     }
-    return { success: true, message: '¡Solicitud enviada correctamente!' };
+    return { success: true, message: 'Request sent successfully!' };
   },
 
   async fetchFriendRequests(): Promise<FriendRequest[]> {
@@ -109,11 +109,11 @@ const ServiceGroups = {
       body: JSON.stringify({ accept }),
     });
     if (!response.ok) {
-      return { success: false, message: 'Error al procesar la solicitud' };
+      return { success: false, message: 'Failed to process request' };
     }
     return {
       success: true,
-      message: accept ? '¡Amigo añadido!' : 'Solicitud rechazada',
+      message: accept ? 'Friend added!' : 'Request rejected',
     };
   },
 
@@ -132,19 +132,19 @@ const ServiceGroups = {
     const diffMs = now.getTime() - new Date(date).getTime();
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
     
-    if (diffDays === 0) return 'hoy';
-    if (diffDays === 1) return 'ayer';
-    if (diffDays < 7) return `hace ${diffDays} días`;
+    if (diffDays === 0) return 'today';
+    if (diffDays === 1) return 'yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
     if (diffDays < 30) {
       const weeks = Math.floor(diffDays / 7);
-      return weeks === 1 ? 'hace 1 semana' : `hace ${weeks} semanas`;
+      return weeks === 1 ? '1 week ago' : `${weeks} weeks ago`;
     }
     if (diffDays < 365) {
       const months = Math.floor(diffDays / 30);
-      return months === 1 ? 'hace 1 mes' : `hace ${months} meses`;
+      return months === 1 ? '1 month ago' : `${months} months ago`;
     }
     const years = Math.floor(diffDays / 365);
-    return years === 1 ? 'hace 1 año' : `hace ${years} años`;
+    return years === 1 ? '1 year ago' : `${years} years ago`;
   },
 
   getInitials(name: string): string {

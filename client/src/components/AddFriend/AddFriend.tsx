@@ -45,7 +45,7 @@ const AddFriend: React.FC<AddFriendProps> = ({
     } catch {
       setSnackbar({
         open: true,
-        message: 'Error al copiar el código',
+        message: 'Failed to copy code',
         severity: 'error',
       });
     }
@@ -55,7 +55,7 @@ const AddFriend: React.FC<AddFriendProps> = ({
     if (!inputCode.trim()) {
       setSnackbar({
         open: true,
-        message: 'Introduce un código de amigo',
+        message: 'Enter a friend code',
         severity: 'error',
       });
       return;
@@ -64,7 +64,7 @@ const AddFriend: React.FC<AddFriendProps> = ({
     if (inputCode.trim() === myFriendCode) {
       setSnackbar({
         open: true,
-        message: 'No puedes añadirte a ti mismo',
+        message: 'You cannot add yourself',
         severity: 'error',
       });
       return;
@@ -84,7 +84,7 @@ const AddFriend: React.FC<AddFriendProps> = ({
     } catch {
       setSnackbar({
         open: true,
-        message: 'Error al enviar la solicitud',
+        message: 'Failed to send request',
         severity: 'error',
       });
     } finally {
@@ -117,7 +117,7 @@ const AddFriend: React.FC<AddFriendProps> = ({
       {/* Header con Toggle */}
       <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
         <Typography sx={{ fontWeight: 600, fontSize: 14, color: 'primary.main' }}>
-          Añadir amigo
+          Add friend
         </Typography>
         
         <ToggleButtonGroup
@@ -157,7 +157,7 @@ const AddFriend: React.FC<AddFriendProps> = ({
         >
           <ToggleButton value="code">
             <Tag sx={{ fontSize: 16, mr: 0.5 }} />
-            Código
+            Code
           </ToggleButton>
           <ToggleButton value="qr">
             <QrCode2 sx={{ fontSize: 16, mr: 0.5 }} />
@@ -195,7 +195,7 @@ const AddFriend: React.FC<AddFriendProps> = ({
             />
           </Box>
           <Typography sx={{ fontSize: 13, color: 'text.secondary', mb: 0.5 }}>
-            Pide a tu amigo que escanee este QR
+            Ask your friend to scan this QR
           </Typography>
           <Typography
             sx={{
@@ -214,7 +214,7 @@ const AddFriend: React.FC<AddFriendProps> = ({
       {mode === 'code' && (
         <>
           <Typography sx={{ color: 'text.secondary', fontSize: 13, mb: 1 }}>
-            Tu código de amigo
+            Your friend code
           </Typography>
 
           <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2.5 }}>
@@ -260,21 +260,21 @@ const AddFriend: React.FC<AddFriendProps> = ({
                 },
               }}
             >
-              {copied ? '¡Copiado!' : 'Copiar'}
+              {copied ? 'Copied!' : 'Copy'}
             </Button>
           </Stack>
 
           <Divider sx={{ my: 2 }} />
 
           <Typography sx={{ color: 'text.secondary', fontSize: 13, mb: 1.5 }}>
-            Enviar solicitud de amistad
+            Send friend request
           </Typography>
 
           <Stack direction="row" spacing={1.5} alignItems="center">
             <TextField
               fullWidth
               size="small"
-              placeholder="Código de 10 dígitos"
+              placeholder="10-digit code"
               value={inputCode}
               onChange={(e) => setInputCode(e.target.value.replace(/\D/g, '').slice(0, 10))}
               disabled={isLoading}
@@ -321,7 +321,7 @@ const AddFriend: React.FC<AddFriendProps> = ({
                 },
               }}
             >
-              Enviar
+              Send
             </Button>
           </Stack>
         </>

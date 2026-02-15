@@ -8,8 +8,8 @@ import { fadeInUp, getStaggerDelay } from '@/utils/animations';
 // Mock data - esto vendría de una API basado en el ID del evento
 const eventData = {
   id: 1,
-  name: 'Cena Lo de Carlitos',
-  createdAt: 'Hace 1 hora',
+  name: 'Dinner at Carlitos',
+  createdAt: '1 hour ago',
   peopleCount: 5,
 };
 
@@ -64,7 +64,7 @@ const PageEventDetail: React.FC = () => {
             <Stack direction="row" alignItems="center" spacing={0.5} mt={0.5}>
               <People sx={{ fontSize: 16, color: 'rgba(255,255,255,0.7)' }} />
               <Typography sx={{ color: 'rgba(255,255,255,0.7)', fontSize: 13 }}>
-                {eventData.peopleCount} personas · {eventData.createdAt}
+                {eventData.peopleCount} people · {eventData.createdAt}
               </Typography>
             </Stack>
           </Box>
@@ -82,7 +82,7 @@ const PageEventDetail: React.FC = () => {
         }}>
           <CardContent sx={{ p: 2.5 }}>
             <Typography sx={{ fontSize: 12, color: 'text.secondary', fontWeight: 500, textTransform: 'uppercase', letterSpacing: 0.5 }}>
-              Recaudado
+              Collected
             </Typography>
             <Typography sx={{ fontSize: 34, fontWeight: 700, color: 'text.primary' }}>
               ${summaryData.collected}
@@ -109,17 +109,17 @@ const PageEventDetail: React.FC = () => {
             <Stack direction="row" justifyContent="space-between">
               <Box sx={{ textAlign: 'center' }}>
                 <Typography sx={{ fontWeight: 700, fontSize: 20, color: 'success.main' }}>{summaryData.paid}</Typography>
-                <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>Pagaron</Typography>
+                <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>Paid</Typography>
               </Box>
               <Divider orientation="vertical" flexItem />
               <Box sx={{ textAlign: 'center' }}>
                 <Typography sx={{ fontWeight: 700, fontSize: 20, color: 'warning.main' }}>{summaryData.pending}</Typography>
-                <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>Pendientes</Typography>
+                <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>Pending</Typography>
               </Box>
               <Divider orientation="vertical" flexItem />
               <Box sx={{ textAlign: 'center' }}>
                 <Typography sx={{ fontWeight: 700, fontSize: 20, color: 'text.primary' }}>${summaryData.remaining}</Typography>
-                <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>Falta</Typography>
+                <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>Remaining</Typography>
               </Box>
             </Stack>
           </CardContent>
@@ -127,8 +127,8 @@ const PageEventDetail: React.FC = () => {
 
         {/* Participants Header */}
         <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1.5}>
-          <Typography sx={{ fontSize: 16, fontWeight: 600, color: 'text.primary' }}>Participantes</Typography>
-          <Typography sx={{ fontSize: 14, color: 'primary.main', fontWeight: 500 }}>Ver todos</Typography>
+          <Typography sx={{ fontSize: 16, fontWeight: 600, color: 'text.primary' }}>Participants</Typography>
+          <Typography sx={{ fontSize: 14, color: 'primary.main', fontWeight: 500 }}>View all</Typography>
         </Stack>
 
         {/* Participant List */}
@@ -162,7 +162,7 @@ const PageEventDetail: React.FC = () => {
                       <AccessTime sx={{ fontSize: 14, color: 'warning.main' }} />
                     )}
                     <Typography sx={{ fontSize: 13, color: p.status === 'paid' ? 'success.main' : 'warning.main' }}>
-                      {p.status === 'paid' ? `Pagó a las ${p.time}` : 'Pendiente'}
+                      {p.status === 'paid' ? `Paid at ${p.time}` : 'Pending'}
                     </Typography>
                   </Stack>
                 </Box>
@@ -207,7 +207,7 @@ const PageEventDetail: React.FC = () => {
               },
             }}
           >
-            Recordar a {pendingCount} pendientes
+            Remind {pendingCount} pending
           </Button>
         </Box>
       )}

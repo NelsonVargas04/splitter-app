@@ -23,18 +23,18 @@ const userSummary = {
   name: 'Juan',
   totalSpent: 2450,
   thisMonth: 850,
-  pendingToCollect: 375, // Te deben
-  pendingToPay: 125, // Debes
+  pendingToCollect: 375, // Owed to you
+  pendingToPay: 125, // You owe
 };
 
 // Eventos recientes
 const recentEvents = [
   { 
     id: 1, 
-    name: 'Cena Lo de Carlitos', 
+    name: 'Dinner at Carlitos', 
     icon: 'restaurant',
     iconBgColor: '#7c4dff',
-    date: 'Hace 1 hora',
+    date: '1 hour ago',
     total: 625,
     myShare: 125,
     status: 'pending', // pending, settled
@@ -43,10 +43,10 @@ const recentEvents = [
   },
   { 
     id: 2, 
-    name: 'Fútbol 5 - Sábado', 
+    name: '5-a-side Soccer - Saturday', 
     icon: 'sports',
     iconBgColor: '#4caf50',
-    date: 'Hace 2 días',
+    date: '2 days ago',
     total: 800,
     myShare: 100,
     status: 'settled',
@@ -55,10 +55,10 @@ const recentEvents = [
   },
   { 
     id: 3, 
-    name: 'Supermercado compartido', 
+    name: 'Shared groceries', 
     icon: 'shopping',
     iconBgColor: '#ff9800',
-    date: 'Hace 1 semana',
+    date: '1 week ago',
     total: 1200,
     myShare: 400,
     status: 'settled',
@@ -67,10 +67,10 @@ const recentEvents = [
   },
   { 
     id: 4, 
-    name: 'Viaje a Mendoza', 
+    name: 'Trip to Mendoza', 
     icon: 'flight',
     iconBgColor: '#e91e63',
-    date: 'Hace 2 semanas',
+    date: '2 weeks ago',
     total: 15000,
     myShare: 3750,
     status: 'pending',
@@ -100,7 +100,7 @@ const PageDashboard: React.FC = () => {
         <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
           <Box>
             <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: 24 }}>
-              Hola, {userSummary.name} <WavingHand sx={{ fontSize: 24, color: '#ffca28', verticalAlign: 'middle' }} />
+              Hi, {userSummary.name} <WavingHand sx={{ fontSize: 24, color: '#ffca28', verticalAlign: 'middle' }} />
             </Typography>
           </Box>
           <IconButton sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: '#fff' }}>
@@ -120,7 +120,7 @@ const PageDashboard: React.FC = () => {
               <Stack direction="row" alignItems="center" spacing={1} mb={1}>
                 <TrendingUp sx={{ color: '#4caf50', fontSize: 20 }} />
                 <Typography sx={{ color: 'rgba(255,255,255,0.7)', fontSize: 12 }}>
-                  Te deben
+                  Owed to you
                 </Typography>
               </Stack>
               <Typography sx={{ color: '#4caf50', fontWeight: 700, fontSize: 22 }}>
@@ -139,7 +139,7 @@ const PageDashboard: React.FC = () => {
               <Stack direction="row" alignItems="center" spacing={1} mb={1}>
                 <TrendingDown sx={{ color: '#ff9800', fontSize: 20 }} />
                 <Typography sx={{ color: 'rgba(255,255,255,0.7)', fontSize: 12 }}>
-                  Debes
+                  You owe
                 </Typography>
               </Stack>
               <Typography sx={{ color: '#ff9800', fontWeight: 700, fontSize: 22 }}>
@@ -166,14 +166,14 @@ const PageDashboard: React.FC = () => {
               </Avatar>
               <Box sx={{ flex: 1 }}>
                 <Typography sx={{ fontSize: 13, color: 'text.secondary' }}>
-                  Gastado este mes
+                  Spent this month
                 </Typography>
                 <Typography sx={{ fontWeight: 700, fontSize: 24, color: 'text.primary' }}>
                   ${userSummary.thisMonth.toLocaleString()}
                 </Typography>
               </Box>
               <Chip 
-                label={`${pendingEvents} pendientes`}
+                label={`${pendingEvents} pending`}
                 size="small"
                 sx={{ 
                   bgcolor: pendingEvents > 0 ? 'warning.light' : 'success.light',
@@ -190,21 +190,21 @@ const PageDashboard: React.FC = () => {
                 <Typography sx={{ fontWeight: 700, fontSize: 18, color: 'text.primary' }}>
                   {recentEvents.length}
                 </Typography>
-                <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>Eventos</Typography>
+                <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>Events</Typography>
               </Box>
               <Divider orientation="vertical" flexItem />
               <Box sx={{ textAlign: 'center', flex: 1 }}>
                 <Typography sx={{ fontWeight: 700, fontSize: 18, color: 'text.primary' }}>
                   12
                 </Typography>
-                <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>Amigos</Typography>
+                <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>Friends</Typography>
               </Box>
               <Divider orientation="vertical" flexItem />
               <Box sx={{ textAlign: 'center', flex: 1 }}>
                 <Typography sx={{ fontWeight: 700, fontSize: 18, color: 'text.primary' }}>
                   3
                 </Typography>
-                <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>Grupos</Typography>
+                <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>Groups</Typography>
               </Box>
             </Stack>
           </CardContent>
@@ -215,11 +215,11 @@ const PageDashboard: React.FC = () => {
           <Stack direction="row" alignItems="center" spacing={1}>
             <Receipt sx={{ color: 'text.secondary', fontSize: 20 }} />
             <Typography sx={{ fontSize: 16, fontWeight: 600, color: 'text.primary' }}>
-              Eventos recientes
+              Recent events
             </Typography>
           </Stack>
           <Typography sx={{ fontSize: 14, color: 'primary.main', fontWeight: 500, cursor: 'pointer' }}>
-            Ver todos
+            View all
           </Typography>
         </Stack>
 
@@ -258,17 +258,17 @@ const PageDashboard: React.FC = () => {
                     <Stack direction="row" alignItems="center" spacing={1} mt={0.5}>
                       <Groups sx={{ fontSize: 14, color: 'text.secondary' }} />
                       <Typography sx={{ fontSize: 13, color: 'text.secondary' }}>
-                        {event.participants} personas · {event.date}
+                        {event.participants} people · {event.date}
                       </Typography>
                     </Stack>
                     
                     <Stack direction="row" alignItems="center" justifyContent="space-between" mt={1}>
                       <Typography sx={{ fontSize: 13, color: 'text.secondary' }}>
-                        Tu parte: <strong style={{ color: 'inherit' }}>${event.myShare}</strong>
+                        Your share: <strong style={{ color: 'inherit' }}>${event.myShare}</strong>
                       </Typography>
                       {event.status === 'pending' ? (
                         <Chip 
-                          label={`${event.pendingCount} pendiente${event.pendingCount > 1 ? 's' : ''}`}
+                          label={`${event.pendingCount} pending`}
                           size="small"
                           sx={{ 
                             bgcolor: 'warning.light', 
@@ -280,7 +280,7 @@ const PageDashboard: React.FC = () => {
                         />
                       ) : (
                         <Chip 
-                          label="Completado"
+                          label="Completed"
                           size="small"
                           sx={{ 
                             bgcolor: 'success.light', 

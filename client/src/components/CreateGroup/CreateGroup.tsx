@@ -47,18 +47,18 @@ interface CreateGroupProps {
 }
 
 const GROUP_ICONS = {
-  sports_soccer: { icon: SportsSoccer, label: 'Fútbol' },
-  work: { icon: Work, label: 'Trabajo' },
-  restaurant: { icon: Restaurant, label: 'Comida' },
-  home: { icon: Home, label: 'Casa' },
-  flight: { icon: Flight, label: 'Viajes' },
-  beach: { icon: BeachAccess, label: 'Playa' },
-  celebration: { icon: Celebration, label: 'Fiestas' },
-  music: { icon: MusicNote, label: 'Música' },
-  shopping: { icon: ShoppingBag, label: 'Compras' },
-  fitness: { icon: FitnessCenter, label: 'Ejercicio' },
-  pets: { icon: Pets, label: 'Mascotas' },
-  school: { icon: School, label: 'Estudios' },
+  sports_soccer: { icon: SportsSoccer, label: 'Soccer' },
+  work: { icon: Work, label: 'Work' },
+  restaurant: { icon: Restaurant, label: 'Food' },
+  home: { icon: Home, label: 'Home' },
+  flight: { icon: Flight, label: 'Travel' },
+  beach: { icon: BeachAccess, label: 'Beach' },
+  celebration: { icon: Celebration, label: 'Parties' },
+  music: { icon: MusicNote, label: 'Music' },
+  shopping: { icon: ShoppingBag, label: 'Shopping' },
+  fitness: { icon: FitnessCenter, label: 'Fitness' },
+  pets: { icon: Pets, label: 'Pets' },
+  school: { icon: School, label: 'Education' },
 };
 
 const COLORS = [
@@ -122,7 +122,7 @@ const CreateGroup: React.FC<CreateGroupProps> = ({
               <Close />
             </IconButton>
             <Typography sx={{ fontWeight: 700, fontSize: 20, color: '#fff' }}>
-              Crear grupo
+              Create group
             </Typography>
             <Box sx={{ width: 40 }} />
           </Stack>
@@ -132,17 +132,17 @@ const CreateGroup: React.FC<CreateGroupProps> = ({
           {/* Nombre del grupo */}
           <TextField
             fullWidth
-            label="Nombre del grupo"
+            label="Group name"
             value={groupName}
             onChange={(e) => setGroupName(e.target.value)}
             sx={{ mb: 4 }}
-            placeholder="Ej: Amigos del fútbol"
+            placeholder="E.g.: Soccer friends"
             size="medium"
           />
 
           {/* Personalización */}
           <Typography sx={{ fontWeight: 600, fontSize: 16, mb: 3, color: isDark ? '#e0e0e0' : '#374151' }}>
-            Personalización
+            Customization
           </Typography>
           
           {/* Vista previa centrada */}
@@ -174,7 +174,7 @@ const CreateGroup: React.FC<CreateGroupProps> = ({
                 <SelectedIcon sx={{ fontSize: 36, color: '#fff' }} />
               </Avatar>
               <Typography sx={{ fontSize: 12, color: isDark ? '#9ca3af' : '#9ca3af', fontWeight: 500 }}>
-                Vista previa del grupo
+                Group preview
               </Typography>
             </Box>
           </Box>
@@ -226,18 +226,18 @@ const CreateGroup: React.FC<CreateGroupProps> = ({
                   mr: 2,
                 }}
               />
-              Color del grupo
+              Group color
             </Button>
           </Stack>
 
           {/* Añadir amigos */}
           <Typography sx={{ fontWeight: 600, fontSize: 16, mb: 3, color: isDark ? '#e0e0e0' : '#374151' }}>
-            Añadir amigos ({selectedFriends.length})
+            Add friends ({selectedFriends.length})
           </Typography>
           
           {friends.length === 0 ? (
             <Typography sx={{ color: '#9ca3af', fontStyle: 'italic', py: 4, textAlign: 'center' }}>
-              No tienes amigos agregados aún
+              You don't have any friends added yet
             </Typography>
           ) : (
             <Box sx={{ maxHeight: 240, overflow: 'auto', border: isDark ? '1px solid #424242' : '1px solid #e5e7eb', borderRadius: 2, p: 2, bgcolor: isDark ? '#1e1e1e' : 'transparent' }}>
@@ -282,7 +282,7 @@ const CreateGroup: React.FC<CreateGroupProps> = ({
           {selectedFriends.length > 0 && (
             <Box sx={{ mt: 3, p: 3, bgcolor: isDark ? '#1e1e1e' : '#f9fafb', borderRadius: 2 }}>
               <Typography sx={{ fontSize: 14, color: isDark ? '#e0e0e0' : '#374151', mb: 2, fontWeight: 600 }}>
-                Miembros seleccionados ({selectedFriends.length}):
+                Selected members ({selectedFriends.length}):
               </Typography>
               <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                 {selectedFriends.map((friendId) => {
@@ -362,7 +362,7 @@ const CreateGroup: React.FC<CreateGroupProps> = ({
             }}
             startIcon={<Add />}
           >
-            Crear grupo
+            Create group
           </Button>
         </Box>
       </Dialog>
@@ -382,7 +382,7 @@ const CreateGroup: React.FC<CreateGroupProps> = ({
         }}
       >
         <DialogTitle sx={{ textAlign: 'center', pb: 3, fontSize: 18, fontWeight: 600 }}>
-          Elige un icono para tu grupo
+          Choose an icon for your group
         </DialogTitle>
         <DialogContent sx={{ pt: 0 }}>
           <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap justifyContent="center">
@@ -431,7 +431,7 @@ const CreateGroup: React.FC<CreateGroupProps> = ({
         }}
       >
         <DialogTitle sx={{ textAlign: 'center', pb: 3, fontSize: 18, fontWeight: 600 }}>
-          Elige un color para tu grupo
+          Choose a color for your group
         </DialogTitle>
         <DialogContent sx={{ pt: 0 }}>
           <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap justifyContent="center">

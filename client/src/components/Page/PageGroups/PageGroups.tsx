@@ -58,7 +58,7 @@ const GROUP_ICONS = {
 const mockGroups: Group[] = [
   {
     id: 1,
-    name: 'Amigos del Fútbol',
+    name: 'Soccer Friends',
     icon: 'sports_soccer',
     iconBgColor: '#7c4dff',
     createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
@@ -75,7 +75,7 @@ const mockGroups: Group[] = [
   },
   {
     id: 2,
-    name: 'Compañeros de Trabajo',
+    name: 'Work Colleagues',
     icon: 'work',
     iconBgColor: '#ff6b6b',
     createdAt: new Date(Date.now() - 150 * 24 * 60 * 60 * 1000),
@@ -90,7 +90,7 @@ const mockGroups: Group[] = [
   },
   {
     id: 3,
-    name: 'Grupo de Asado',
+    name: 'BBQ Group',
     icon: 'restaurant',
     iconBgColor: '#ffa726',
     createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
@@ -110,7 +110,7 @@ const mockFriends: Friend[] = [
 
 const mockCurrentUser: User = {
   id: 1,
-  name: 'Mi Usuario',
+  name: 'My User',
   email: 'yo@email.com',
   initials: 'MU',
   avatarColor: '#7c4dff',
@@ -159,10 +159,10 @@ const PageGroups: React.FC = () => {
     
     const existingFriend = friends.find((f) => f.friendCode === code);
     if (existingFriend) {
-      return { success: false, message: 'Este usuario ya es tu amigo' };
+      return { success: false, message: 'This user is already your friend' };
     }
     
-    return { success: true, message: '¡Solicitud de amistad enviada!' };
+    return { success: true, message: 'Friend request sent!' };
   };
 
   const renderMemberAvatars = (members: Group['members'], maxVisible = 3) => {
@@ -187,7 +187,7 @@ const PageGroups: React.FC = () => {
           )}
         </AvatarGroup>
         <Typography sx={{ color: 'text.secondary', fontSize: 13, ml: 1 }}>
-          {members.length} miembros
+          {members.length} members
         </Typography>
       </Stack>
     );
@@ -233,7 +233,7 @@ const PageGroups: React.FC = () => {
             {group.name}
           </Typography>
           <Typography sx={{ fontSize: 13, color: 'text.secondary', mb: 1 }}>
-            Creado {ServiceGroups.formatTimeAgo(group.createdAt)}
+            Created {ServiceGroups.formatTimeAgo(group.createdAt)}
           </Typography>
           {renderMemberAvatars(group.members)}
         </Box>
@@ -296,14 +296,14 @@ const PageGroups: React.FC = () => {
           <IconButton sx={{ bgcolor: 'rgba(255,255,255,0.15)', color: '#fff' }} onClick={() => navigate(-1)}>
             <ArrowBack />
           </IconButton>
-          <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: 20 }}>Grupos y Amigos</Typography>
-          <Box sx={{ width: 40 }} /> {/* Espaciador para centrar el título */}
+          <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: 20 }}>Groups & Friends</Typography>
+          <Box sx={{ width: 40 }} /> {/* Spacer to center title */}
         </Stack>
 
         {/* Search Bar */}
         <TextField
           fullWidth
-          placeholder="Buscar grupos o amigos..."
+          placeholder="Search groups or friends..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           sx={{
@@ -353,8 +353,8 @@ const PageGroups: React.FC = () => {
             },
           }}
         >
-          <Tab value="groups" label="Grupos" />
-          <Tab value="friends" label="Amigos" />
+          <Tab value="groups" label="Groups" />
+          <Tab value="friends" label="Friends" />
         </Tabs>
       </Box>
 
@@ -363,13 +363,13 @@ const PageGroups: React.FC = () => {
         {activeTab === 'groups' && (
           <>
             <Typography sx={{ fontWeight: 700, fontSize: 16, color: 'text.primary', mb: 2 }}>
-              Mis Grupos ({filteredGroups.length})
+              My Groups ({filteredGroups.length})
             </Typography>
             {filteredGroups.map((group, index) => renderGroupCard(group, index))}
             {filteredGroups.length === 0 && (
               <Box sx={{ textAlign: 'center', py: 4 }}>
                 <Typography sx={{ color: 'text.secondary' }}>
-                  {searchQuery ? 'No se encontraron grupos' : 'No tienes grupos aún'}
+                  {searchQuery ? 'No groups found' : 'You don\'t have any groups yet'}
                 </Typography>
               </Box>
             )}
@@ -385,13 +385,13 @@ const PageGroups: React.FC = () => {
               />
             )}
             <Typography sx={{ fontWeight: 700, fontSize: 16, color: 'text.primary', mb: 2 }}>
-              Mis Amigos ({filteredFriends.length})
+              My Friends ({filteredFriends.length})
             </Typography>
             {filteredFriends.map((friend, index) => renderFriendCard(friend, index))}
             {filteredFriends.length === 0 && (
               <Box sx={{ textAlign: 'center', py: 4 }}>
                 <Typography sx={{ color: 'text.secondary' }}>
-                  {searchQuery ? 'No se encontraron amigos' : 'No tienes amigos agregados'}
+                  {searchQuery ? 'No friends found' : 'You don\'t have any friends added'}
                 </Typography>
               </Box>
             )}
@@ -444,7 +444,7 @@ const PageGroups: React.FC = () => {
           }}
           startIcon={<Add />}
         >
-          {activeTab === 'groups' ? 'Crear nuevo grupo' : 'Añadir amigo'}
+          {activeTab === 'groups' ? 'Create new group' : 'Add friend'}
         </Button>
       </Box>
 
@@ -497,7 +497,7 @@ const PageGroups: React.FC = () => {
               onSendRequest={async (code) => {
                 console.log('Sending friend request to:', code);
                 setShowAddFriend(false);
-                return { success: true, message: 'Solicitud enviada' };
+                return { success: true, message: 'Request sent' };
               }}
             />
           </Box>

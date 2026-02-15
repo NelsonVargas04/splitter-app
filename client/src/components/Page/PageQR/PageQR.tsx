@@ -65,7 +65,7 @@ const PageQR: React.FC = () => {
     } catch (err) {
       setSnackbar({
         open: true,
-        message: 'No se pudo acceder a la cámara',
+        message: 'Could not access camera',
         severity: 'error',
       });
     }
@@ -95,7 +95,7 @@ const PageQR: React.FC = () => {
       } else {
         setSnackbar({
           open: true,
-          message: 'QR no válido para añadir amigo',
+          message: 'Invalid QR for adding friend',
           severity: 'error',
         });
       }
@@ -105,7 +105,7 @@ const PageQR: React.FC = () => {
       const total = parseFloat((Math.random() * 500 + 50).toFixed(2));
       setScannedBill({ 
         total,
-        items: ['Comida', 'Bebidas', 'Propina']
+        items: ['Food', 'Drinks', 'Tip']
       });
       stopScanner();
     }
@@ -120,7 +120,7 @@ const PageQR: React.FC = () => {
     
     setSnackbar({
       open: true,
-      message: '¡Solicitud de amistad enviada!',
+      message: 'Friend request sent!',
       severity: 'success',
     });
     
@@ -195,7 +195,7 @@ const PageQR: React.FC = () => {
             <ArrowBack />
           </IconButton>
           <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: 18 }}>
-            Escáner QR
+            QR Scanner
           </Typography>
           <IconButton
             sx={{ 
@@ -224,7 +224,7 @@ const PageQR: React.FC = () => {
             value="bill"
             icon={<Receipt sx={{ fontSize: 20 }} />}
             iconPosition="start"
-            label="Dividir cuenta"
+            label="Split bill"
             sx={{
               color: 'rgba(255,255,255,0.6)',
               textTransform: 'none',
@@ -238,7 +238,7 @@ const PageQR: React.FC = () => {
             value="friend"
             icon={<PersonAdd sx={{ fontSize: 20 }} />}
             iconPosition="start"
-            label="Añadir amigo"
+            label="Add friend"
             sx={{
               color: 'rgba(255,255,255,0.6)',
               textTransform: 'none',
@@ -353,13 +353,13 @@ const PageQR: React.FC = () => {
             {/* Texto según modo */}
             <Typography sx={{ color: '#fff', mt: 3, textAlign: 'center', fontSize: 15, fontWeight: 500 }}>
               {scanMode === 'bill' 
-                ? 'Escanea el QR de la cuenta' 
-                : 'Escanea el código de tu amigo'}
+                ? 'Scan the bill QR code' 
+                : 'Scan your friend\'s code'}
             </Typography>
             <Typography sx={{ color: 'rgba(255,255,255,0.5)', mt: 1, textAlign: 'center', fontSize: 13, px: 4 }}>
               {scanMode === 'bill'
-                ? 'La cuenta se dividirá automáticamente entre tu grupo'
-                : 'Desde "Perfil" pueden mostrar su QR personal'}
+                ? 'The bill will be automatically split among your group'
+                : 'They can show their personal QR from "Profile"'}
             </Typography>
           </>
         ) : scannedBill ? (
@@ -393,12 +393,12 @@ const PageQR: React.FC = () => {
             </Box>
             
             <Typography sx={{ fontWeight: 700, fontSize: 18, color: '#1a1a1a', textAlign: 'center', mb: 1 }}>
-              ¡Cuenta detectada!
+              Bill detected!
             </Typography>
             
             <Box sx={{ bgcolor: '#f9fafb', borderRadius: 2, p: 2, mb: 3 }}>
               <Typography sx={{ fontSize: 13, color: '#6b7280', textAlign: 'center' }}>
-                Total a dividir
+                Total to split
               </Typography>
               <Typography sx={{ fontSize: 32, fontWeight: 700, color: '#7c4dff', textAlign: 'center' }}>
                 ${scannedBill.total.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
@@ -419,7 +419,7 @@ const PageQR: React.FC = () => {
                   '&:hover': { bgcolor: '#6a3de8' },
                 }}
               >
-                Dividir con mi grupo
+                Split with my group
               </Button>
               
               <Button
@@ -435,7 +435,7 @@ const PageQR: React.FC = () => {
                   borderRadius: 2,
                 }}
               >
-                Escanear otra cuenta
+                Scan another bill
               </Button>
             </Stack>
           </Box>
@@ -470,7 +470,7 @@ const PageQR: React.FC = () => {
             </Box>
             
             <Typography sx={{ fontWeight: 700, fontSize: 18, color: '#1a1a1a', textAlign: 'center', mb: 1 }}>
-              ¡Código detectado!
+              Code detected!
             </Typography>
             
             <Typography
@@ -503,7 +503,7 @@ const PageQR: React.FC = () => {
                   '&:hover': { bgcolor: '#6a3de8' },
                 }}
               >
-                {isProcessing ? 'Enviando...' : 'Enviar solicitud'}
+                {isProcessing ? 'Sending...' : 'Send request'}
               </Button>
               
               <Button
@@ -520,7 +520,7 @@ const PageQR: React.FC = () => {
                   borderRadius: 2,
                 }}
               >
-                Escanear otro
+                Scan another
               </Button>
             </Stack>
           </Box>

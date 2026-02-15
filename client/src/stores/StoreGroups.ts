@@ -90,7 +90,7 @@ const useStoreGroups = create<GroupsState>((set, get) => ({
       iconBgColor: groupData.iconBgColor,
       members: groupData.members.map(id => ({ 
         id, 
-        name: 'Miembro', 
+        name: 'Member', 
         initials: 'M', 
         avatarColor: '#7c4dff' 
       })),
