@@ -21,33 +21,23 @@ import DarkModeIcon from '@mui/icons-material/DarkMode';
 import BottomNavBar from '@/components/BottomNavBar';
 import { useNavigate } from 'react-router-dom';
 import useStoreTheme from '@/stores/StoreTheme';
+import useStoreAuth from '@/stores/StoreAuth';
+import ServiceUsers from '@/services/ServiceUsers';
+import { UserStats } from '@/models/domain';
 import { fadeInUp, scaleIn } from '@/utils/animations';
 
-const mockUser = {
-  initials: 'JD',
-  name: 'Juan Diaz',
-  email: 'juan.diaz@email.com',
-  phone: '+54 9 11 1234-5678',
-  username: '@juandiaz',
-  paymentAccounts: [
-    { type: 'Mercado Pago', value: 'juan.diaz.mp' },
-    { type: 'CBU', value: '0170099220000012345678' },
-    { type: 'Bank Alias', value: 'JUAN.DIAZ.BANCO' },
-  ],
-  notifications: {
-    push: true,
-    email: true,
-    sms: false,
-    reminders: true,
-  },
-  privacy: {
-    publicProfile: true,
-    showHistory: false,
-  },
-};
-
 const PageProfile: React.FC = () => {
-  const [user, setUser] = useState(mockUser);
+  const [user, setUser] = useState({
+    initials: '',
+    name: '',
+    email: '',
+    phone: '',
+    username: '',
+    paymentAccounts: [] as { type: string; value: string }[],
+    notifications: { push: true, email: true, sms: false, reminders: true },
+    privacy: { publicProfile: true, showHistory: false },
+  });
+  const [stats, setStats] = useState<UserStats>({ friendsCount: 0, groupsCount: 0, activeGroupsCount: 0, paymentsMade: 0 });
   const [editMode, setEditMode] = useState(false);
   const [showAddAccount, setShowAddAccount] = useState(false);
   const [newAccount, setNewAccount] = useState({ type: '', value: '' });
@@ -59,7 +49,37 @@ const PageProfile: React.FC = () => {
   const navigate = useNavigate();
   
   const { mode, toggleTheme } = useStoreTheme();
+  const { logout } = useStoreAuth();
   const isDark = mode === 'dark';
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const [userData, statsData, accounts, notifSettings, privSettings] = await Promise.all([
+          ServiceUsers.getMe(),
+          ServiceUsers.getStats(),
+          ServiceUsers.getPaymentAccounts(),
+          ServiceUsers.getNotificationSettings(),
+          ServiceUsers.getPrivacySettings(),
+        ]);
+        setUser({
+          initials: userData.initials,
+          name: userData.name,
+          email: userData.email,
+          phone: userData.phone || '',
+          username: userData.username || '',
+          paymentAccounts: accounts.map(a => ({ type: a.label, value: a.value })),
+          notifications: notifSettings,
+          privacy: privSettings,
+        });
+        setStats(statsData);
+        if (userData.avatarUrl) setAvatarUrl(userData.avatarUrl);
+      } catch {
+        // Keep defaults if API fails
+      }
+    };
+    loadProfile();
+  }, []);
 
   useEffect(() => {
     if (qrOpen) {
@@ -217,7 +237,7 @@ const PageProfile: React.FC = () => {
             }}
           >
             <GroupAddIcon sx={{ fontSize: 32, color: 'primary.main', mb: 0.5 }} />
-            <Typography sx={{ fontSize: 22, fontWeight: 700, color: 'text.primary' }}>12</Typography>
+            <Typography sx={{ fontSize: 22, fontWeight: 700, color: 'text.primary' }}>{stats.activeGroupsCount}</Typography>
             <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>Active groups</Typography>
           </Paper>
           <Paper 
@@ -237,7 +257,7 @@ const PageProfile: React.FC = () => {
             }}
           >
             <CheckCircleIcon sx={{ fontSize: 32, color: 'success.main', mb: 0.5 }} />
-            <Typography sx={{ fontSize: 22, fontWeight: 700, color: 'text.primary' }}>45</Typography>
+            <Typography sx={{ fontSize: 22, fontWeight: 700, color: 'text.primary' }}>{stats.paymentsMade}</Typography>
             <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>Payments made</Typography>
           </Paper>
         </Stack>
@@ -449,6 +469,12 @@ const PageProfile: React.FC = () => {
               '&:hover': { background: 'linear-gradient(90deg, #6a3de8, #4a2a9a)' },
             }}
             startIcon={<SaveIcon />}
+            onClick={async () => {
+              try {
+                await ServiceUsers.updateMe({ name: user.name, email: user.email, phone: user.phone, username: user.username });
+                setEditMode(false);
+              } catch { /* handle error */ }
+            }}
           >
             Save changes
           </Button>
@@ -465,6 +491,10 @@ const PageProfile: React.FC = () => {
             size="large"
             sx={{ borderRadius: 3, fontWeight: 600, height: 52, color: '#ef4444', borderColor: '#ef4444', textTransform: 'none' }}
             startIcon={<LogoutIcon />}
+            onClick={async () => {
+              await logout();
+              navigate('/login');
+            }}
           >
             Log out
           </Button>

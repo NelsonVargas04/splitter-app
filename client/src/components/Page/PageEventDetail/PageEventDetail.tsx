@@ -1,42 +1,80 @@
-import React from 'react';
-import { Box, Typography, Stack, IconButton, LinearProgress, Button, Avatar, Card, CardContent, Divider } from '@mui/material';
-import { ArrowBack, MoreVert, Notifications, Restaurant, People, CheckCircle, AccessTime } from '@mui/icons-material';
+import React, { useEffect, useState } from 'react';
+import { Box, Typography, Stack, IconButton, LinearProgress, Button, Avatar, Card, CardContent, Divider, CircularProgress } from '@mui/material';
+import { ArrowBack, MoreVert, Notifications, Restaurant, People, CheckCircle, AccessTime, SportsSoccer, ShoppingBag, Flight, Receipt } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router-dom';
 import BottomNavBar from '@/components/BottomNavBar';
 import { fadeInUp, getStaggerDelay } from '@/utils/animations';
+import ServiceEvents from '@/services/ServiceEvents';
+import { Event as AppEvent, EventSummary } from '@/models/domain';
 
-// Mock data - esto vendría de una API basado en el ID del evento
-const eventData = {
-  id: 1,
-  name: 'Dinner at Carlitos',
-  createdAt: '1 hour ago',
-  peopleCount: 5,
+const getEventIconComponent = (iconType: string) => {
+  switch (iconType) {
+    case 'restaurant': return <Restaurant sx={{ fontSize: 28 }} />;
+    case 'sports_soccer': return <SportsSoccer sx={{ fontSize: 28 }} />;
+    case 'shopping': return <ShoppingBag sx={{ fontSize: 28 }} />;
+    case 'flight': return <Flight sx={{ fontSize: 28 }} />;
+    default: return <Receipt sx={{ fontSize: 28 }} />;
+  }
 };
-
-const summaryData = {
-  collected: 375,
-  total: 625,
-  paid: 3,
-  pending: 2,
-  remaining: 250,
-};
-
-const participants = [
-  { id: 1, name: 'Juan Pérez', initials: 'JP', status: 'paid', method: 'Mercado Pago', time: '18:45', amount: 125, avatarColor: '#7c4dff' },
-  { id: 2, name: 'María García', initials: 'MG', status: 'paid', method: 'Mercado Pago', time: '18:46', amount: 125, avatarColor: '#4ecdc4' },
-  { id: 3, name: 'Carlos López', initials: 'CL', status: 'pending', method: 'Manual', time: null, amount: 125, avatarColor: '#ff6b6b' },
-  { id: 4, name: 'Ana Martínez', initials: 'AM', status: 'paid', method: 'Mercado Pago', time: '18:50', amount: 125, avatarColor: '#45b7d1' },
-  { id: 5, name: 'Pedro Ruiz', initials: 'PR', status: 'pending', method: 'Mercado Pago', time: null, amount: 125, avatarColor: '#96ceb4' },
-];
 
 const PageEventDetail: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const progress = (summaryData.collected / summaryData.total) * 100;
-  const pendingCount = participants.filter(p => p.status === 'pending').length;
+  const [event, setEvent] = useState<AppEvent | null>(null);
+  const [summary, setSummary] = useState<EventSummary | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [reminding, setReminding] = useState(false);
 
-  // En una app real, aquí cargarías los datos del evento usando el ID
-  console.log('Event ID:', id);
+  useEffect(() => {
+    if (!id) return;
+    const loadEvent = async () => {
+      setLoading(true);
+      try {
+        const [eventData, summaryData] = await Promise.all([
+          ServiceEvents.fetchEvent(parseInt(id)),
+          ServiceEvents.fetchEventSummary(parseInt(id)),
+        ]);
+        setEvent(eventData);
+        setSummary(summaryData);
+      } catch {
+        // handle error
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadEvent();
+  }, [id]);
+
+  const handleRemind = async () => {
+    if (!id) return;
+    setReminding(true);
+    try {
+      await ServiceEvents.remindPending(parseInt(id));
+    } finally {
+      setReminding(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <Box sx={{ width: '100%', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'background.default' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (!event || !summary) {
+    return (
+      <Box sx={{ width: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', bgcolor: 'background.default' }}>
+        <Typography>Event not found</Typography>
+        <Button onClick={() => navigate(-1)}>Go back</Button>
+      </Box>
+    );
+  }
+
+  const progress = (summary.collected / summary.total) * 100;
+  const pendingCount = event.participants.filter(p => p.status === 'pending').length;
+  const remaining = summary.total - summary.collected;
 
   return (
     <Box sx={{ width: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
@@ -56,15 +94,15 @@ const PageEventDetail: React.FC = () => {
 
         {/* Event Title */}
         <Stack direction="row" alignItems="center" spacing={2}>
-          <Avatar sx={{ bgcolor: '#7c4dff', width: 56, height: 56 }}>
-            <Restaurant sx={{ fontSize: 28 }} />
+          <Avatar sx={{ bgcolor: event.iconBgColor || '#7c4dff', width: 56, height: 56 }}>
+            {getEventIconComponent(event.icon)}
           </Avatar>
           <Box>
-            <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: 22 }}>{eventData.name}</Typography>
+            <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: 22 }}>{event.name}</Typography>
             <Stack direction="row" alignItems="center" spacing={0.5} mt={0.5}>
               <People sx={{ fontSize: 16, color: 'rgba(255,255,255,0.7)' }} />
               <Typography sx={{ color: 'rgba(255,255,255,0.7)', fontSize: 13 }}>
-                {eventData.peopleCount} people · {eventData.createdAt}
+                {event.participantCount} people
               </Typography>
             </Stack>
           </Box>
@@ -85,10 +123,10 @@ const PageEventDetail: React.FC = () => {
               Collected
             </Typography>
             <Typography sx={{ fontSize: 34, fontWeight: 700, color: 'text.primary' }}>
-              ${summaryData.collected}
+              ${summary.collected}
             </Typography>
             <Typography sx={{ fontSize: 14, color: 'text.secondary', mb: 2 }}>
-              de ${summaryData.total} total
+              de ${summary.total} total
             </Typography>
 
             <LinearProgress
@@ -108,17 +146,17 @@ const PageEventDetail: React.FC = () => {
 
             <Stack direction="row" justifyContent="space-between">
               <Box sx={{ textAlign: 'center' }}>
-                <Typography sx={{ fontWeight: 700, fontSize: 20, color: 'success.main' }}>{summaryData.paid}</Typography>
+                <Typography sx={{ fontWeight: 700, fontSize: 20, color: 'success.main' }}>{summary.paidCount}</Typography>
                 <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>Paid</Typography>
               </Box>
               <Divider orientation="vertical" flexItem />
               <Box sx={{ textAlign: 'center' }}>
-                <Typography sx={{ fontWeight: 700, fontSize: 20, color: 'warning.main' }}>{summaryData.pending}</Typography>
+                <Typography sx={{ fontWeight: 700, fontSize: 20, color: 'warning.main' }}>{summary.pendingCount}</Typography>
                 <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>Pending</Typography>
               </Box>
               <Divider orientation="vertical" flexItem />
               <Box sx={{ textAlign: 'center' }}>
-                <Typography sx={{ fontWeight: 700, fontSize: 20, color: 'text.primary' }}>${summaryData.remaining}</Typography>
+                <Typography sx={{ fontWeight: 700, fontSize: 20, color: 'text.primary' }}>${remaining}</Typography>
                 <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>Remaining</Typography>
               </Box>
             </Stack>
@@ -137,7 +175,7 @@ const PageEventDetail: React.FC = () => {
           boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
           animation: `${fadeInUp} 0.5s ease-out 0.1s both`,
         }}>
-          {participants.map((p, index) => (
+          {event.participants.map((p, index) => (
             <Box key={p.id}>
               <Box sx={{ 
                 p: 2, 
@@ -150,7 +188,7 @@ const PageEventDetail: React.FC = () => {
                   bgcolor: 'action.hover',
                 },
               }}>
-                <Avatar sx={{ bgcolor: p.avatarColor, width: 44, height: 44, fontSize: 15, fontWeight: 600 }}>
+                <Avatar sx={{ bgcolor: p.avatarColor || '#7c4dff', width: 44, height: 44, fontSize: 15, fontWeight: 600 }}>
                   {p.initials}
                 </Avatar>
                 <Box sx={{ flex: 1 }}>
@@ -162,13 +200,13 @@ const PageEventDetail: React.FC = () => {
                       <AccessTime sx={{ fontSize: 14, color: 'warning.main' }} />
                     )}
                     <Typography sx={{ fontSize: 13, color: p.status === 'paid' ? 'success.main' : 'warning.main' }}>
-                      {p.status === 'paid' ? `Paid at ${p.time}` : 'Pending'}
+                      {p.status === 'paid' ? 'Paid' : 'Pending'}
                     </Typography>
                   </Stack>
                 </Box>
                 <Typography sx={{ fontWeight: 700, fontSize: 17, color: 'text.primary' }}>${p.amount}</Typography>
               </Box>
-              {index < participants.length - 1 && <Divider />}
+              {index < event.participants.length - 1 && <Divider />}
             </Box>
           ))}
         </Card>
@@ -187,7 +225,9 @@ const PageEventDetail: React.FC = () => {
           <Button
             fullWidth
             variant="contained"
-            startIcon={<Notifications />}
+            startIcon={reminding ? <CircularProgress size={20} sx={{ color: '#fff' }} /> : <Notifications />}
+            disabled={reminding}
+            onClick={handleRemind}
             sx={{
               height: 52,
               borderRadius: 3,

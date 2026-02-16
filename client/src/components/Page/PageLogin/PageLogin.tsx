@@ -1,22 +1,30 @@
 import React, { useState } from 'react';
-import { Box, TextField, Button, Checkbox, FormControlLabel, Typography, Link, CircularProgress } from '@mui/material';
+import { Box, TextField, Button, Checkbox, FormControlLabel, Typography, Link, CircularProgress, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import useStoreAuth from '@/stores/StoreAuth';
 
 const LoginForm: React.FC = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const { login, loginAsGuest, isLoading: loading, error, setPendingEmail } = useStoreAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    const success = await login(username, password);
+    if (success) {
+      navigate('/dashboard');
+    } else {
+      setPendingEmail(username);
       navigate('/verify');
-    }, 1800);
+    }
   };
 
-  const handleGuestLogin = () => {
-    // TODO: login como invitado
+  const handleGuestLogin = async () => {
+    const success = await loginAsGuest();
+    if (success) {
+      navigate('/dashboard');
+    }
   };
 
   const inputStyles = {
@@ -39,12 +47,20 @@ const LoginForm: React.FC = () => {
       onSubmit={handleSubmit}
       sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2.5, width: '100%' }}
     >
+      {error && (
+        <Alert severity="error" sx={{ width: '100%', borderRadius: 2 }}>
+          {error}
+        </Alert>
+      )}
+
       <TextField
         fullWidth
         placeholder="Username"
         name="username"
         autoComplete="username"
         variant="outlined"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
         sx={inputStyles}
       />
 
@@ -55,6 +71,8 @@ const LoginForm: React.FC = () => {
         type="password"
         autoComplete="current-password"
         variant="outlined"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
         sx={inputStyles}
       />
 

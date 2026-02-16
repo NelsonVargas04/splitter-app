@@ -1,126 +1,81 @@
-import { Group, Friend, GroupMember, API_BASE, User, FriendRequest } from '@/models/domain';
+import { Group, Friend, GroupMember, User, FriendRequest } from '@/models/domain';
+import Backend from '@/services/Backend';
 
 const ServiceGroups = {
   async fetchGroups(): Promise<Group[]> {
-    const response = await fetch(`${API_BASE}/groups`);
-    if (!response.ok) throw new Error('Failed to fetch groups');
-    return response.json();
+    return Backend.get<Group[]>('/groups');
   },
 
   async fetchGroup(id: number): Promise<Group> {
-    const response = await fetch(`${API_BASE}/groups/${id}`);
-    if (!response.ok) throw new Error('Failed to fetch group');
-    return response.json();
+    return Backend.get<Group>(`/groups/${id}`);
   },
 
   async createGroup(data: Omit<Group, 'id' | 'createdAt'>): Promise<Group> {
-    const response = await fetch(`${API_BASE}/groups`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
-    if (!response.ok) throw new Error('Failed to create group');
-    return response.json();
+    return Backend.post<Group>('/groups', data);
   },
 
   async updateGroup(id: number, data: Partial<Group>): Promise<Group> {
-    const response = await fetch(`${API_BASE}/groups/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
-    if (!response.ok) throw new Error('Failed to update group');
-    return response.json();
+    return Backend.put<Group>(`/groups/${id}`, data);
   },
 
   async deleteGroup(id: number): Promise<void> {
-    const response = await fetch(`${API_BASE}/groups/${id}`, {
-      method: 'DELETE',
-    });
-    if (!response.ok) throw new Error('Failed to delete group');
+    return Backend.delete(`/groups/${id}`);
   },
 
   async addMember(groupId: number, member: Omit<GroupMember, 'id'>): Promise<GroupMember> {
-    const response = await fetch(`${API_BASE}/groups/${groupId}/members`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(member),
-    });
-    if (!response.ok) throw new Error('Failed to add member');
-    return response.json();
+    return Backend.post<GroupMember>(`/groups/${groupId}/members`, member);
   },
 
   async removeMember(groupId: number, memberId: number): Promise<void> {
-    const response = await fetch(`${API_BASE}/groups/${groupId}/members/${memberId}`, {
-      method: 'DELETE',
-    });
-    if (!response.ok) throw new Error('Failed to remove member');
+    return Backend.delete(`/groups/${groupId}/members/${memberId}`);
   },
 
   async fetchFriends(): Promise<Friend[]> {
-    const response = await fetch(`${API_BASE}/friends`);
-    if (!response.ok) throw new Error('Failed to fetch friends');
-    return response.json();
+    return Backend.get<Friend[]>('/friends');
   },
 
   async addFriend(data: Omit<Friend, 'id' | 'addedAt'>): Promise<Friend> {
-    const response = await fetch(`${API_BASE}/friends`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
-    if (!response.ok) throw new Error('Failed to add friend');
-    return response.json();
+    return Backend.post<Friend>('/friends', data);
   },
 
   async removeFriend(id: number): Promise<void> {
-    const response = await fetch(`${API_BASE}/friends/${id}`, {
-      method: 'DELETE',
-    });
-    if (!response.ok) throw new Error('Failed to remove friend');
+    return Backend.delete(`/friends/${id}`);
   },
 
   async sendFriendRequest(friendCode: string): Promise<{ success: boolean; message: string }> {
-    const response = await fetch(`${API_BASE}/friends/request`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ friendCode }),
-    });
-    if (!response.ok) {
-      const error = await response.json();
-      return { success: false, message: error.message || 'Failed to send request' };
+    try {
+      const result = await Backend.post<{ success: boolean; message: string }>('/friends/request', { friendCode });
+      return result;
+    } catch (error) {
+      return { success: false, message: error instanceof Error ? error.message : 'Failed to send request' };
     }
-    return { success: true, message: 'Request sent successfully!' };
   },
 
   async fetchFriendRequests(): Promise<FriendRequest[]> {
-    const response = await fetch(`${API_BASE}/friends/requests`);
-    if (!response.ok) throw new Error('Failed to fetch friend requests');
-    return response.json();
+    return Backend.get<FriendRequest[]>('/friends/requests');
   },
 
   async respondToFriendRequest(
     requestId: number,
     accept: boolean
   ): Promise<{ success: boolean; message: string }> {
-    const response = await fetch(`${API_BASE}/friends/requests/${requestId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ accept }),
-    });
-    if (!response.ok) {
+    try {
+      await Backend.put(`/friends/requests/${requestId}`, { accept });
+      return {
+        success: true,
+        message: accept ? 'Friend added!' : 'Request rejected',
+      };
+    } catch {
       return { success: false, message: 'Failed to process request' };
     }
-    return {
-      success: true,
-      message: accept ? 'Friend added!' : 'Request rejected',
-    };
   },
 
   async findUserByCode(friendCode: string): Promise<User | null> {
-    const response = await fetch(`${API_BASE}/users/find?code=${friendCode}`);
-    if (!response.ok) return null;
-    return response.json();
+    try {
+      return await Backend.get<User>(`/users/find?code=${friendCode}`);
+    } catch {
+      return null;
+    }
   },
 
   generateFriendCode(): string {

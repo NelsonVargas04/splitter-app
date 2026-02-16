@@ -37,7 +37,7 @@ import useStoreTheme from '@/stores/StoreTheme';
 import ServiceGroups from '@/services/ServiceGroups';
 import AddFriend from '@/components/AddFriend';
 import { CreateGroup } from '@/components/CreateGroup';
-import { Group, Friend, User } from '@/models/domain';
+import { Group, Friend } from '@/models/domain';
 import { fadeInUp, scaleIn } from '@/utils/animations';
 
 const GROUP_ICONS = {
@@ -53,69 +53,6 @@ const GROUP_ICONS = {
   fitness: FitnessCenter,
   pets: Pets,
   school: School,
-};
-
-const mockGroups: Group[] = [
-  {
-    id: 1,
-    name: 'Soccer Friends',
-    icon: 'sports_soccer',
-    iconBgColor: '#7c4dff',
-    createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
-    members: [
-      { id: 1, name: 'Juan Pérez', initials: 'JP', avatarColor: '#ff6b6b' },
-      { id: 2, name: 'María García', initials: 'MG', avatarColor: '#4ecdc4' },
-      { id: 3, name: 'Carlos López', initials: 'CL', avatarColor: '#45b7d1' },
-      { id: 4, name: 'Ana Martínez', initials: 'AM', avatarColor: '#96ceb4' },
-      { id: 5, name: 'Pedro Ruiz', initials: 'PR', avatarColor: '#ffeaa7' },
-      { id: 6, name: 'Laura Sánchez', initials: 'LS', avatarColor: '#dfe6e9' },
-      { id: 7, name: 'Diego Torres', initials: 'DT', avatarColor: '#ff7675' },
-      { id: 8, name: 'Sofia Hernández', initials: 'SH', avatarColor: '#74b9ff' },
-    ],
-  },
-  {
-    id: 2,
-    name: 'Work Colleagues',
-    icon: 'work',
-    iconBgColor: '#ff6b6b',
-    createdAt: new Date(Date.now() - 150 * 24 * 60 * 60 * 1000),
-    members: [
-      { id: 9, name: 'Andrea Morales', initials: 'AM', avatarColor: '#a29bfe' },
-      { id: 10, name: 'Pablo Reyes', initials: 'PR', avatarColor: '#fd79a8' },
-      { id: 11, name: 'Laura Sánchez', initials: 'LS', avatarColor: '#00b894' },
-      { id: 12, name: 'Miguel Díaz', initials: 'MD', avatarColor: '#e17055' },
-      { id: 13, name: 'Carmen Vega', initials: 'CV', avatarColor: '#0984e3' },
-      { id: 14, name: 'Roberto Gil', initials: 'RG', avatarColor: '#6c5ce7' },
-    ],
-  },
-  {
-    id: 3,
-    name: 'BBQ Group',
-    icon: 'restaurant',
-    iconBgColor: '#ffa726',
-    createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-    members: [
-      { id: 15, name: 'Jorge Domínguez', initials: 'JD', avatarColor: '#e84393' },
-      { id: 16, name: 'Martín Quiroga', initials: 'MQ', avatarColor: '#00cec9' },
-      { id: 17, name: 'Ricardo Paz', initials: 'RP', avatarColor: '#fdcb6e' },
-    ],
-  },
-];
-
-const mockFriends: Friend[] = [
-  { id: 1, name: 'Juan Pérez', initials: 'JP', avatarColor: '#ff6b6b', email: 'juan@email.com', friendCode: '2345678901', addedAt: new Date() },
-  { id: 2, name: 'María García', initials: 'MG', avatarColor: '#4ecdc4', email: 'maria@email.com', friendCode: '3456789012', addedAt: new Date() },
-  { id: 3, name: 'Carlos López', initials: 'CL', avatarColor: '#45b7d1', email: 'carlos@email.com', friendCode: '4567890123', addedAt: new Date() },
-];
-
-const mockCurrentUser: User = {
-  id: 1,
-  name: 'My User',
-  email: 'yo@email.com',
-  initials: 'MU',
-  avatarColor: '#7c4dff',
-  friendCode: '1121736329',
-  createdAt: new Date(),
 };
 
 const PageGroups: React.FC = () => {
@@ -142,9 +79,22 @@ const PageGroups: React.FC = () => {
   } = useStoreGroups();
 
   useEffect(() => {
-    setGroups(mockGroups);
-    setFriends(mockFriends);
-    setCurrentUser(mockCurrentUser);
+    const loadData = async () => {
+      try {
+        const [groupsData, friendsData] = await Promise.all([
+          ServiceGroups.fetchGroups(),
+          ServiceGroups.fetchFriends(),
+        ]);
+        setGroups(groupsData);
+        setFriends(friendsData);
+
+        const userData = await import('@/services/ServiceUsers').then(m => m.default.getMe());
+        setCurrentUser(userData);
+      } catch {
+        // Data will remain empty if API is unavailable
+      }
+    };
+    loadData();
   }, [setGroups, setFriends, setCurrentUser]);
 
   const filteredGroups = getFilteredGroups();
@@ -155,14 +105,7 @@ const PageGroups: React.FC = () => {
   };
 
   const handleSendFriendRequest = async (code: string): Promise<{ success: boolean; message: string }> => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    
-    const existingFriend = friends.find((f) => f.friendCode === code);
-    if (existingFriend) {
-      return { success: false, message: 'This user is already your friend' };
-    }
-    
-    return { success: true, message: 'Friend request sent!' };
+    return ServiceGroups.sendFriendRequest(code);
   };
 
   const renderMemberAvatars = (members: Group['members'], maxVisible = 3) => {
@@ -454,8 +397,27 @@ const PageGroups: React.FC = () => {
       {showCreateGroup && (
         <CreateGroup
           friends={friends}
-          onCreateGroup={(groupData) => {
-            createGroup(groupData);
+          onCreateGroup={async (groupData) => {
+            try {
+              await ServiceGroups.createGroup({
+                name: groupData.name,
+                icon: groupData.icon,
+                iconBgColor: groupData.iconBgColor,
+                members: groupData.members.map(id => {
+                  const friend = friends.find(f => f.id === id);
+                  return {
+                    id,
+                    name: friend?.name || 'Member',
+                    initials: friend?.initials || 'M',
+                    avatarColor: friend?.avatarColor || '#7c4dff',
+                  };
+                }),
+              });
+              const updatedGroups = await ServiceGroups.fetchGroups();
+              setGroups(updatedGroups);
+            } catch {
+              createGroup(groupData);
+            }
             setShowCreateGroup(false);
           }}
           onClose={() => setShowCreateGroup(false)}
@@ -495,9 +457,11 @@ const PageGroups: React.FC = () => {
             <AddFriend
               myFriendCode={currentUser?.friendCode || ''}
               onSendRequest={async (code) => {
-                console.log('Sending friend request to:', code);
-                setShowAddFriend(false);
-                return { success: true, message: 'Request sent' };
+                const result = await ServiceGroups.sendFriendRequest(code);
+                if (result.success) {
+                  setShowAddFriend(false);
+                }
+                return result;
               }}
             />
           </Box>

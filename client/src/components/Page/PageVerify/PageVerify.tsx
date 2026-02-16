@@ -1,29 +1,33 @@
 import React, { useState } from 'react'
 import { Box, TextField, Button, Link, CircularProgress, Snackbar, Alert } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
+import useStoreAuth from '@/stores/StoreAuth'
 
 const RESEND_SECONDS = 30
 
 const PageVerifyForm: React.FC = () => {
-  const [loading, setLoading] = useState(false)
+  const [code, setCode] = useState('')
   const [resendDisabled, setResendDisabled] = useState(false)
   const [resendTimer, setResendTimer] = useState(RESEND_SECONDS)
   const [showToast, setShowToast] = useState(false)
   const timerRef = React.useRef<ReturnType<typeof setInterval> | null>(null)
   const navigate = useNavigate()
+  const { verify, resendCode, isLoading: loading, error } = useStoreAuth()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
+    const success = await verify(code)
+    if (success) {
       navigate('/dashboard')
-    }, 1800)
+    }
   }
 
-  const handleResend = () => {
+  const handleResend = async () => {
     setResendDisabled(true)
-    setShowToast(true)
+    const success = await resendCode()
+    if (success) {
+      setShowToast(true)
+    }
     setResendTimer(RESEND_SECONDS)
     timerRef.current = setInterval(() => {
       setResendTimer(prev => {
@@ -35,7 +39,6 @@ const PageVerifyForm: React.FC = () => {
         return prev - 1
       })
     }, 1000)
-    // TODO: resend code
   }
 
   React.useEffect(() => {
@@ -75,11 +78,19 @@ const PageVerifyForm: React.FC = () => {
         onSubmit={handleSubmit}
         sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2.5, width: '100%' }}
       >
+        {error && (
+          <Alert severity="error" sx={{ width: '100%', borderRadius: 2 }}>
+            {error}
+          </Alert>
+        )}
+
         <TextField
           fullWidth
           placeholder="Verification code"
           name="code"
           variant="outlined"
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
           sx={inputStyles}
         />
 

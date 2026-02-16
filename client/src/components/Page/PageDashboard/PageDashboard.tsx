@@ -1,5 +1,5 @@
-import React from 'react';
-import { Box, Typography, Stack, IconButton, Card, CardContent, Divider, Avatar, Chip } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Box, Typography, Stack, IconButton, Card, CardContent, Divider, Avatar, Chip, CircularProgress } from '@mui/material';
 import { 
   Notifications, 
   TrendingUp, 
@@ -17,72 +17,15 @@ import {
 import { useNavigate } from 'react-router-dom';
 import BottomNavBar from '@/components/BottomNavBar';
 import { fadeInUp, getStaggerDelay } from '@/utils/animations';
-
-// Mock data - Resumen general del usuario
-const userSummary = {
-  name: 'Juan',
-  totalSpent: 2450,
-  thisMonth: 850,
-  pendingToCollect: 375, // Owed to you
-  pendingToPay: 125, // You owe
-};
-
-// Eventos recientes
-const recentEvents = [
-  { 
-    id: 1, 
-    name: 'Dinner at Carlitos', 
-    icon: 'restaurant',
-    iconBgColor: '#7c4dff',
-    date: '1 hour ago',
-    total: 625,
-    myShare: 125,
-    status: 'pending', // pending, settled
-    participants: 5,
-    pendingCount: 2,
-  },
-  { 
-    id: 2, 
-    name: '5-a-side Soccer - Saturday', 
-    icon: 'sports',
-    iconBgColor: '#4caf50',
-    date: '2 days ago',
-    total: 800,
-    myShare: 100,
-    status: 'settled',
-    participants: 8,
-    pendingCount: 0,
-  },
-  { 
-    id: 3, 
-    name: 'Shared groceries', 
-    icon: 'shopping',
-    iconBgColor: '#ff9800',
-    date: '1 week ago',
-    total: 1200,
-    myShare: 400,
-    status: 'settled',
-    participants: 3,
-    pendingCount: 0,
-  },
-  { 
-    id: 4, 
-    name: 'Trip to Mendoza', 
-    icon: 'flight',
-    iconBgColor: '#e91e63',
-    date: '2 weeks ago',
-    total: 15000,
-    myShare: 3750,
-    status: 'pending',
-    participants: 4,
-    pendingCount: 1,
-  },
-];
+import useStoreAuth from '@/stores/StoreAuth';
+import ServiceEvents from '@/services/ServiceEvents';
+import ServiceUsers from '@/services/ServiceUsers';
+import { Event as AppEvent, UserBalance, UserStats } from '@/models/domain';
 
 const getEventIcon = (iconType: string) => {
   switch (iconType) {
     case 'restaurant': return <Restaurant />;
-    case 'sports': return <SportsSoccer />;
+    case 'sports_soccer': return <SportsSoccer />;
     case 'shopping': return <ShoppingBag />;
     case 'flight': return <Flight />;
     default: return <Receipt />;
@@ -91,7 +34,36 @@ const getEventIcon = (iconType: string) => {
 
 const PageDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const { user, fetchCurrentUser } = useStoreAuth();
+  const [recentEvents, setRecentEvents] = useState<AppEvent[]>([]);
+  const [balance, setBalance] = useState<UserBalance>({ pendingToCollect: 0, pendingToPay: 0, thisMonthSpent: 0, thisMonthEvents: 0 });
+  const [stats, setStats] = useState<UserStats>({ friendsCount: 0, groupsCount: 0, activeGroupsCount: 0, paymentsMade: 0 });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        await fetchCurrentUser();
+        const [eventsData, balanceData, statsData] = await Promise.all([
+          ServiceEvents.fetchRecent(10),
+          ServiceUsers.getBalance(),
+          ServiceUsers.getStats(),
+        ]);
+        setRecentEvents(eventsData);
+        setBalance(balanceData);
+        setStats(statsData);
+      } catch {
+        // Si falla la API, mantenemos datos vacíos
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, [fetchCurrentUser]);
+
   const pendingEvents = recentEvents.filter(e => e.status === 'pending').length;
+  const userName = user?.name?.split(' ')[0] || 'User';
 
   return (
     <Box sx={{ width: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
@@ -100,7 +72,7 @@ const PageDashboard: React.FC = () => {
         <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
           <Box>
             <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: 24 }}>
-              Hi, {userSummary.name} <WavingHand sx={{ fontSize: 24, color: '#ffca28', verticalAlign: 'middle' }} />
+              Hi, {userName} <WavingHand sx={{ fontSize: 24, color: '#ffca28', verticalAlign: 'middle' }} />
             </Typography>
           </Box>
           <IconButton sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: '#fff' }}>
@@ -124,7 +96,7 @@ const PageDashboard: React.FC = () => {
                 </Typography>
               </Stack>
               <Typography sx={{ color: '#4caf50', fontWeight: 700, fontSize: 22 }}>
-                ${userSummary.pendingToCollect.toLocaleString()}
+                ${balance.pendingToCollect.toLocaleString()}
               </Typography>
             </CardContent>
           </Card>
@@ -143,7 +115,7 @@ const PageDashboard: React.FC = () => {
                 </Typography>
               </Stack>
               <Typography sx={{ color: '#ff9800', fontWeight: 700, fontSize: 22 }}>
-                ${userSummary.pendingToPay.toLocaleString()}
+                ${balance.pendingToPay.toLocaleString()}
               </Typography>
             </CardContent>
           </Card>
@@ -169,7 +141,7 @@ const PageDashboard: React.FC = () => {
                   Spent this month
                 </Typography>
                 <Typography sx={{ fontWeight: 700, fontSize: 24, color: 'text.primary' }}>
-                  ${userSummary.thisMonth.toLocaleString()}
+                  ${balance.thisMonthSpent.toLocaleString()}
                 </Typography>
               </Box>
               <Chip 
@@ -195,14 +167,14 @@ const PageDashboard: React.FC = () => {
               <Divider orientation="vertical" flexItem />
               <Box sx={{ textAlign: 'center', flex: 1 }}>
                 <Typography sx={{ fontWeight: 700, fontSize: 18, color: 'text.primary' }}>
-                  12
+                  {stats.friendsCount}
                 </Typography>
                 <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>Friends</Typography>
               </Box>
               <Divider orientation="vertical" flexItem />
               <Box sx={{ textAlign: 'center', flex: 1 }}>
                 <Typography sx={{ fontWeight: 700, fontSize: 18, color: 'text.primary' }}>
-                  3
+                  {stats.groupsCount}
                 </Typography>
                 <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>Groups</Typography>
               </Box>
@@ -258,7 +230,7 @@ const PageDashboard: React.FC = () => {
                     <Stack direction="row" alignItems="center" spacing={1} mt={0.5}>
                       <Groups sx={{ fontSize: 14, color: 'text.secondary' }} />
                       <Typography sx={{ fontSize: 13, color: 'text.secondary' }}>
-                        {event.participants} people · {event.date}
+                        {event.participantCount} people
                       </Typography>
                     </Stack>
                     
@@ -268,7 +240,7 @@ const PageDashboard: React.FC = () => {
                       </Typography>
                       {event.status === 'pending' ? (
                         <Chip 
-                          label={`${event.pendingCount} pending`}
+                          label="Pending"
                           size="small"
                           sx={{ 
                             bgcolor: 'warning.light', 
